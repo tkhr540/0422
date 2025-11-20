@@ -194,29 +194,53 @@ document.getElementById("createBtn").onclick=async()=>{
 };
 
 /* スレ開く */
-window.openThread=async id=>{
-  currentThreadId=id;
-  document.getElementById("threadList").style.display="none";
-  document.getElementById("threadView").style.display="block";
-  const postsRef=child(threadsRef,`${id}/posts`);
-  onValue(postsRef,snap=>{
-    const postsDiv=document.getElementById("posts");
-    postsDiv.innerHTML="";
-    const val=snap.val()||{};
-    const items=Object.entries(val).map(([k,v])=>({key:k,v})).sort((a,b)=>(a.v.createdAt||0)-(b.v.createdAt||0));
-    items.forEach((item,idx)=>{
-      const p=item.v;
-      const div=document.createElement("div");
-      div.className="post";
-      div.innerHTML=`
-        <div><b>${idx+1}:</b> <span class="${p.admin?"adminName":""}">${escapeHtml(p.name)}</span> 
-        ${p.admin?"<span style='color:#a00;'>◆管理人</span>":""}<br>${escapeHtml(p.message)}<div class='small'>${p.time}</div></div>
-        ${isAdmin?`<button class='smallBtn' onclick="deleteReply('${item.key}')">削除</button>`:""}
+window.openThread = async id => {
+  currentThreadId = id;
+  document.getElementById("threadList").style.display = "none";
+  document.getElementById("threadView").style.display = "block";
+
+  const postsRef = child(threadsRef, `${id}/posts`);
+
+  onValue(postsRef, snap => {
+    const postsDiv = document.getElementById("posts");
+
+    // ▼▼▼ 自動スクロールしてよいか判定（下にいる場合だけ）
+    const shouldAutoScroll =
+      postsDiv.scrollTop + postsDiv.clientHeight >= postsDiv.scrollHeight - 50;
+    // ▲▲▲ ここ追加
+
+    postsDiv.innerHTML = "";
+
+    const val = snap.val() || {};
+    const items = Object.entries(val)
+      .map(([k, v]) => ({ key: k, v }))
+      .sort((a, b) => (a.v.createdAt || 0) - (b.v.createdAt || 0));
+
+    items.forEach((item, idx) => {
+      const p = item.v;
+      const div = document.createElement("div");
+      div.className = "post";
+      div.innerHTML = `
+        <div>
+          <b>${idx + 1}:</b>
+          <span class="${p.admin ? "adminName" : ""}">${escapeHtml(p.name)}</span>
+          ${p.admin ? "<span style='color:#a00;'>◆管理人</span>" : ""}
+          <br>${escapeHtml(p.message)}
+          <div class='small'>${p.time}</div>
+        </div>
+        ${isAdmin ? `<button class='smallBtn' onclick="deleteReply('${item.key}')">削除</button>` : ""}
       `;
       postsDiv.appendChild(div);
     });
+
+    // ▼▼▼ 下にいた人だけ自動スクロール
+    if (shouldAutoScroll) {
+      postsDiv.scrollTop = postsDiv.scrollHeight;
+    }
+    // ▲▲▲ ここ追加
   });
 };
+
 
 /* 返信 */
 document.getElementById("replyBtn").onclick=async()=>{
