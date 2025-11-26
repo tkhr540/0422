@@ -40,7 +40,17 @@ h1 img { max-width:260px; width:100%; height:auto; }
 .small { font-size:12px; color:var(--muted); }
 
 #posts { max-height:60vh; overflow:auto; margin-top:8px; padding-right:6px; }
-.post { border-bottom:1px dotted #ddd; padding:8px 6px; white-space:pre-wrap; display:flex; justify-content:space-between; }
+.post {
+  border-bottom: 1px dotted #ddd;
+  padding: 4px 4px;              /* ← さらに小さく */
+  white-space: pre-wrap;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  font-size: 12px;               /* ← 文字小さく */
+  line-height: 1.2;              /* ← 高さつめる */
+}
+
 .post .adminName { color:#d00; font-weight:bold; }
 
 .notice { background:#fff8e1; border-left:4px solid var(--admin); padding:10px; font-size:13px; margin:8px 0; color:#333; }
