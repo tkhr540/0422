@@ -18,6 +18,20 @@
 <meta name="google-site-verification" content="NJ3ZzSV5BrGqR09JvoydRajkW1h82XD_W5vvrSn8s7o" />
 
 <style>
+  /* 管理者カラー */
+.admin-blue   { color:#007bff !important; font-weight:bold; }
+.admin-red    { color:#e40000 !important; font-weight:bold; }
+.admin-green  { color:#1b9e31 !important; font-weight:bold; }
+.admin-yellow { color:#d8b400 !important; font-weight:bold; }
+
+/* レインボー文字 */
+.admin-rainbow {
+  font-weight:bold;
+  background: linear-gradient(90deg, red, orange, yellow, green, blue, purple);
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
 :root{ --max-width:900px; --accent:#0044cc; --admin:#ffb300; --muted:#666; }
 body { font-family:"MS PGothic",Arial,sans-serif; background:#eef2f5; margin:0; padding:12px; color:#222; }
 #board { max-width:var(--max-width); margin:0 auto; background:#fff; border:1px solid #ccc; padding:14px; position:relative; box-shadow:0 2px 6px rgba(0,0,0,0.03); }
@@ -113,6 +127,19 @@ button.primary { background:var(--accent); color:#fff; border-color:var(--accent
     <div id="posts"></div>
 
     <div style="margin-top:8px;">
+      <!-- 管理者カラー設定 -->
+<div id="adminColorWrap" style="display:none; margin:6px 0;">
+  🎨 <b>管理者カラー：</b>
+  <select id="adminColor">
+    <option value="">デフォルト</option>
+    <option value="blue">青</option>
+    <option value="red">赤</option>
+    <option value="green">緑</option>
+    <option value="yellow">黄色</option>
+    <option value="rainbow">レインボー</option>
+  </select>
+</div>
+
       <input id="replyName" placeholder="名前（空欄→名無しさん）">
       <textarea id="replyMsg" rows="3" placeholder="返信内容"></textarea>
       <button id="replyBtn" class="primary">返信</button>
@@ -244,8 +271,13 @@ window.openThread = id => {
       div.innerHTML=`
         <div>
           <b>${idx+1}:</b>
-          <span class="${p.admin?"adminName":""}">${escapeHtml(p.name)}</span>
-          ${p.admin?"<span style='color:#a00;'>◆管理人</span>":""}
+         <span class="
+  ${p.admin ? "adminName" : ""}
+  ${p.color ? "admin-" + p.color : ""}
+">${escapeHtml(p.name)}</span>
+
+${p.admin ? "<span class='small'>◆管理人</span>" : ""}
+
           <br>${escapeHtml(p.msg||p.message)}
           <div class="small">${p.time}</div>
         </div>
@@ -276,7 +308,9 @@ replyBtn.onclick = () => {
     msg:m,
     time:ts,
     createdAt:Date.now(),
-    admin:isAdmin||null
+    admin: isAdmin || null,
+color: isAdmin ? adminColor.value : null
+
   });
 
   replyMsg.value="";
@@ -360,6 +394,7 @@ onAuthStateChanged(auth,user=>{
   adminPanel.style.display=isAdmin?"block":"none";
   adminLink.style.display=isAdmin?"none":"inline-block";
   document.getElementById("adminOptions").style.display=isAdmin?"block":"none";
+document.getElementById("adminColorWrap").style.display = isAdmin ? "block" : "none";
 });
 
 
