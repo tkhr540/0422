@@ -227,6 +227,16 @@ onValue(threadsRef, snap => {
     div.appendChild(el);
   });
 });
+  /* ===== 戻るボタン ===== */
+backBtn.onclick = () => {
+  // スレ表示を消して一覧に戻す
+  document.getElementById("threadView").style.display = "none";
+  document.getElementById("threadList").style.display = "block";
+
+  // 投稿の監視を止める（重複読み込み防止）
+  currentThreadId = null;
+};
+
 
 
 /* ===== スレを開く ===== */
