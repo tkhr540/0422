@@ -102,6 +102,8 @@ button.primary { background:var(--accent); color:#fff; border-color:var(--accent
     <input id="newName" placeholder="名前（空欄→名無しさん）">
     <input id="newTitle" placeholder="スレッドタイトル">
     <textarea id="newMessage" rows="4" placeholder="本文"></textarea>
+    <input id="newPass" type="password" placeholder="スレ削除パスワード（任意）">
+
 
     <div id="adminOptions" style="display:none;">
       <label><input type="checkbox" id="newAnnouncement"> 📢告知</label>
@@ -143,7 +145,6 @@ button.primary { background:var(--accent); color:#fff; border-color:var(--accent
       <input id="replyName" placeholder="名前（空欄→名無しさん）">
       <textarea id="replyMsg" rows="3" placeholder="返信内容"></textarea>
       <button id="replyBtn" class="primary">返信</button>
-      <button id="deleteThreadBtn" style="background:#f88;border-color:#c00;">スレ削除</button>
     </div>
   </div>
 </div>
@@ -327,12 +328,38 @@ color: isAdmin ? adminColor.value : null
 };
 
 
-/* ===== スレ削除 ===== */
-window.deleteThread=id=>{
-  if(!confirm("このスレを削除しますか？"))return;
-  remove(ref(db, `threads/${id}`));
-  threadView.style.display="none";
-  threadList.style.display="block";
+/* ===== スレ削除（パスワード対応） ===== */
+window.deleteThread = async (id) => {
+
+  // 管理者は即削除
+  if (isAdmin) {
+    if (confirm("管理者としてスレを削除しますか？")) {
+      remove(ref(db, `threads/${id}`));
+      threadView.style.display = "none";
+      threadList.style.display = "block";
+    }
+    return;
+  }
+
+  // パスワード取得
+  const snap = await get(ref(db, `threads/${id}/threadPass`));
+  const threadPass = snap.val();
+
+  if (!threadPass) {
+    alert("このスレにはパスワードが設定されていません。削除できません。");
+    return;
+  }
+
+  const input = prompt("スレ削除パスワードを入力してください：");
+
+  if (input === threadPass) {
+    alert("スレを削除しました。");
+    remove(ref(db, `threads/${id}`));
+    threadView.style.display = "none";
+    threadList.style.display = "block";
+  } else {
+    alert("パスワードが違います。削除できません。");
+  }
 };
 
 
@@ -355,11 +382,13 @@ createBtn.onclick=()=>{
 
   set(tRef,{
     title,
-    createdAt:Date.now(),
+    createdAt: Date.now(),
+    threadPass: newPass.value || null,  // ← 追加
     announcement:isAdmin&&newAnnouncement.checked?true:null,
     pinned:isAdmin&&newPinned.checked?true:null,
     createdByAdmin:isAdmin?true:null
-  });
+});
+
 
   const p=ref(db, `threads/${tRef.key}/posts`);
   push(p,{
