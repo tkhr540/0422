@@ -215,15 +215,16 @@ onValue(threadsRef, snap => {
       (t.pinned?" pinned":"");
 
     el.innerHTML=`
-      <div>
-        <div class='title'>${t.announcement?"📢 ":""}${escapeHtml(t.title)}</div>
-        <div class='small'>${fmt(t.createdAt)} / 返信${replyCount}件</div>
-      </div>
-      <div>
-        <button class="smallBtn" onclick="openThread('${t.id}')">スレッドを開く</button>
-        ${isAdmin?`<button class='smallBtn' onclick="deleteThread('${t.id}')">削除</button>`:""}
-      </div>
-    `;
+  <div>
+    <div class='title'>${t.announcement?"📢 ":""}${escapeHtml(t.title)}</div>
+    <div class='small'>${fmt(t.createdAt)} / 返信${replyCount}件</div>
+  </div>
+  <div>
+    <button class="smallBtn" onclick="openThread('${t.id}')">スレッドを開く</button>
+    <button class='smallBtn' onclick="deleteThread('${t.id}')">削除</button>
+  </div>
+`;
+
 
     div.appendChild(el);
   });
